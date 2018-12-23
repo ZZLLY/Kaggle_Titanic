@@ -1,5 +1,5 @@
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 import pandas as pd
 import numpy as np
@@ -103,19 +103,19 @@ def one_hot_encode(df):
     dummies_title = pd.get_dummies(df['Title'], prefix='Title')
 
     df = pd.concat([df, dummies_cabin, dummies_embarked, dummies_sex, dummies_pclass, dummies_title], axis=1)
-    df.drop(['Pclass', 'Name', 'Sex', 'Ticket', 'Cabin', 'Embarked', 'Title', 'PassengerId'], axis=1, inplace=True)
+    df.drop(['Pclass', 'Name', 'Sex', 'Ticket', 'Cabin', 'Embarked', 'Title'], axis=1, inplace=True)
     return df
 
 
 def make_normalize(df):
     # age、fare、SibSp、Parch、FamilySize等数值型特征做归一化
-    minMax = MinMaxScaler()
+    std = StandardScaler()
 
-    df['Age'] = minMax.fit_transform(df['Age'])
-    df['Fare'] = minMax.fit_transform(df['Fare'])
-    df['SibSp'] = minMax.fit_transform(df['SibSp'])
-    df['Parch'] = minMax.fit_transform(df['Parch'])
-    df['FamilySize'] = minMax.fit_transform(df['FamilySize'])
+    df['Age'] = std.fit_transform(df['Age'])
+    df['Fare'] = std.fit_transform(df['Fare'])
+    df['SibSp'] = std.fit_transform(df['SibSp'])
+    df['Parch'] = std.fit_transform(df['Parch'])
+    df['FamilySize'] = std.fit_transform(df['FamilySize'])
     return df
 
 
@@ -147,11 +147,13 @@ if __name__ == '__main__':
     # 读取训练集
     train = pd.read_csv('data/train.csv')
     test = pd.read_csv('data/test.csv')
-
+    train.drop(['PassengerId'], axis=1, inplace=True)
     # 数据处理
     train = data_clear(train)
     test = data_clear(test)
-
+    test['Title_Royalty'] = pd.DataFrame(np.zeros((418, 1)))
     # 写入数据集
     train.to_csv('input/train_input.csv', sep=',', header=True, index=False)
     test.to_csv('input/test_input.csv', sep=',', header=True, index=False)
+
+
